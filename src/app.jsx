@@ -157,8 +157,13 @@ Focus on identifying common scam tactics such as:
 Your tone should be cautious, educational, and direct. Do not provide financial advice, only risk analysis based on the text.
         `;
 
-        const apiKey = "AIzaSyB0vIqV9O9QaF35yUe2wPGxVuguC9s8uEs"; // Leave as-is
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+        const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+        if (!apiKey) {
+            setError("API Key is missing. Please check your .env file.");
+            setIsLoading(false);
+            return;
+        }
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
 
         const payload = {
             contents: [{ parts: [{ text: `User Pitch: "${pitchText}"` }] }],
