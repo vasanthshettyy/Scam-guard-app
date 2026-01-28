@@ -157,44 +157,19 @@ Focus on identifying common scam tactics such as:
 Your tone should be cautious, educational, and direct. Do not provide financial advice, only risk analysis based on the text.
         `;
 
-        const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-        if (!apiKey) {
-            setError("API Key is missing. Please check your .env file.");
-            setIsLoading(false);
-            return;
-        }
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
-
-        const payload = {
-            contents: [{ parts: [{ text: `User Pitch: "${pitchText}"` }] }],
-            systemInstruction: { parts: [{ text: systemPrompt }] },
-            generationConfig: {
-                responseMimeType: "application/json",
-            }
-        };
-
         try {
-            const response = await fetch(apiUrl, {
+            const response = await fetch('/api/analyze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                body: JSON.stringify({ pitchText, systemPrompt })
             });
 
             if (!response.ok) {
-                const errorBody = await response.text();
-                throw new Error(`API Error: ${response.status} ${response.statusText}. Details: ${errorBody}`);
+                throw new Error(`Request failed with status ${response.status}`);
             }
 
-            const result = await response.json();
-
-            const candidate = result.candidates?.[0];
-            if (candidate && candidate.content?.parts?.[0]?.text) {
-                const jsonText = candidate.content.parts[0].text;
-                const parsedJson = JSON.parse(jsonText);
-                setAnalysisResult(parsedJson);
-            } else {
-                throw new Error("Invalid response structure from the AI model.");
-            }
+            const parsedJson = await response.json();
+            setAnalysisResult(parsedJson);
 
         } catch (err) {
             console.error(err);
