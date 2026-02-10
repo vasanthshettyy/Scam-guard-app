@@ -1,22 +1,33 @@
 # ScamGuard AI
 
-ScamGuard AI is an intelligent investment pitch analyzer that helps users detect potential scams and red flags in investment proposals using Google's Gemini AI.
+ScamGuard AI is a scam detection suite that helps users identify potential scams through two tools: an **AI-powered investment pitch analyzer** (Gemini API) and a **zero-cost Photo Scam Scanner** (client-side OCR + rule-based detection).
 
 ## Features
 
-- **Risk Analysis**: Assigns a risk score (1-10) to investment pitches.
+### 📝 Text Analyzer (AI-Powered)
+- **Risk Analysis**: Assigns a risk score (1–10) to investment pitches using Gemini AI.
 - **Red Flag Detection**: Identifies specific deceptive tactics and explains them.
 - **Plain English Summary**: Provides a simplified explanation of the risks.
 - **Sample Pitches**: Includes examples to demonstrate functionality.
+
+### 📷 Photo Scam Scanner (Zero-Cost)
+- **Image Upload**: Drag-and-drop or click-to-upload with preview.
+- **Client-Side OCR**: Extracts text from images using Tesseract.js — no server processing.
+- **Rule-Based Scam Detection**: Scores text (0–100) against 60+ patterns across 7 categories.
+- **Detailed Results**: Shows risk score gauge, matched scam indicators, and actionable recommendations.
+- **Fully Private**: All processing happens in the browser — no data leaves the device.
+
+### 🔒 Security
 - **Secure Architecture**: API keys safely stored on the backend, never exposed to the browser.
 
 ## Architecture
 
 - **Frontend**: React + Vite + Tailwind CSS
 - **Backend**: Vercel Serverless Functions
-- **AI**: Google Gemini API (called from backend only)
+- **AI (Text Analyzer)**: Google Gemini API (called from backend only)
+- **OCR (Photo Scanner)**: Tesseract.js (runs entirely in the browser)
 
-The application uses a serverless architecture where the API key is securely stored on the backend. The frontend sends pitch text to the `/api/analyze` endpoint, which then communicates with the Gemini API and returns the analysis.
+The Text Analyzer uses a serverless architecture — the frontend sends pitch text to `/api/analyze`, which calls the Gemini API and returns the analysis. The Photo Scanner is fully client-side: Tesseract.js extracts text from uploaded images, then a rule-based engine (`scamDetector.js`) scores the text against known scam patterns.
 
 ## Setup Instructions
 
@@ -81,30 +92,45 @@ For production or preview deployment:
 
 ## Usage
 
-1. Paste an investment pitch into the text area.
-2. Click "Analyze Pitch".
-3. Review the Risk Score, Red Flags, and Summary.
+### Text Analyzer
+1. Select the **"📝 Text Analyzer"** tab.
+2. Paste an investment pitch into the text area (or click a sample).
+3. Click **"Analyze Pitch"**.
+4. Review the Risk Score, Red Flags, and Summary.
+
+### Photo Scanner
+1. Select the **"📷 Photo Scanner"** tab.
+2. Drag-and-drop or click to upload an image (screenshot of a suspicious email, text, ad, etc.).
+3. Click **"🔍 Scan for Scams"**.
+4. Wait for OCR to extract text (progress bar shown).
+5. Review the Risk Score (0–100), scam indicators, and recommendation.
 
 ## Project Structure
 
 ```
 scamguard-app/
 ├── api/
-│   └── analyze.js          # Serverless function (backend)
+│   └── analyze.js              # Serverless function (Gemini API backend)
 ├── src/
-│   ├── app.jsx             # Main React component
-│   └── main.jsx            # Entry point
-├── .env                    # API key (DO NOT COMMIT)
-├── .env.example            # Template for environment variables
+│   ├── components/
+│   │   └── PhotoScanner.jsx    # Photo upload + OCR + scam analysis UI
+│   ├── lib/
+│   │   └── scamDetector.js     # Rule-based scam detection engine
+│   ├── app.jsx                 # Main React component (tab navigation)
+│   ├── index.css               # Tailwind CSS imports
+│   └── main.jsx                # Entry point
+├── .env                        # API key (DO NOT COMMIT)
+├── .env.example                # Template for environment variables
 └── package.json
 ```
 
 ## Technologies
 
-- **Frontend**: React, Vite, Tailwind CSS
+- **Frontend**: React 18, Vite 5, Tailwind CSS 3
 - **Backend**: Vercel Serverless Functions
 - **AI**: Google Gemini API
-- **Deployment**: Vercel
+- **OCR**: Tesseract.js (client-side)
+- **Deployment**: Vercel (free tier compatible)
 
 ## Security
 
