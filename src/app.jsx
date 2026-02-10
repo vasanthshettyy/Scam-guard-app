@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PhotoScanner from './components/PhotoScanner';
 
 // --- Helper Components ---
 
@@ -9,7 +10,7 @@ const Header = () => (
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="inline-block mr-2 text-red-500"><path d="M21 13V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8" /><path d="m18 18-6-6" /><path d="m12 18 6-6" /><line x1="12" x2="18" y1="12" y2="18" /></svg>
                 ScamGuard AI
             </h1>
-            <p className="text-sm text-gray-400">Your Investment Pitch Analyzer</p>
+            <p className="text-sm text-gray-400">Your Scam Detection Suite</p>
         </div>
     </header>
 );
@@ -104,10 +105,26 @@ const AnalysisResult = ({ result }) => {
     );
 };
 
+// --- Tab Navigation ---
+
+const TabButton = ({ label, icon, isActive, onClick }) => (
+    <button
+        onClick={onClick}
+        className={`flex items-center gap-2 px-6 py-3 font-semibold text-sm rounded-t-lg transition-all duration-300 ${isActive
+                ? 'bg-gray-800 text-white border-t-2 border-red-500'
+                : 'bg-gray-900/50 text-gray-400 hover:text-gray-200 hover:bg-gray-800/50'
+            }`}
+    >
+        <span>{icon}</span>
+        <span>{label}</span>
+    </button>
+);
+
 
 // --- Main App Component ---
 
 export default function App() {
+    const [activeTab, setActiveTab] = useState('text');
     const [pitchText, setPitchText] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [analysisResult, setAnalysisResult] = useState(null);
@@ -215,43 +232,69 @@ Your tone should be cautious, educational, and direct. Do not provide financial 
             <Header />
 
             <main className="container mx-auto px-6 py-8">
-                <div className="max-w-3xl mx-auto text-center">
-                    <h2 className="text-3xl font-bold mb-2">Uncover Hidden Risks in Investment Pitches</h2>
-                    <p className="text-gray-400 mb-8">
-                        Paste any investment pitch, business plan, or crypto whitepaper below. Our AI will analyze it for common red flags, deceptive language, and potential scam tactics.
-                    </p>
-                </div>
-
-                <div className="max-w-3xl mx-auto bg-gray-800 p-6 rounded-lg shadow-2xl border border-gray-700">
-                    <textarea
-                        className="w-full h-48 p-4 bg-gray-900 text-gray-200 border border-gray-600 rounded-md focus:ring-2 focus:ring-red-500 focus:outline-none transition-all duration-300"
-                        placeholder="Paste the investment pitch text here..."
-                        value={pitchText}
-                        onChange={(e) => setPitchText(e.target.value)}
-                        disabled={isLoading}
-                    />
-
-                    {error && <p className="text-red-400 mt-4 text-sm">{error}</p>}
-
-                    <div className="mt-4 text-center">
-                        <button
-                            className="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg transition-all duration-300 disabled:bg-gray-600 disabled:cursor-not-allowed transform hover:scale-105"
-                            onClick={handleAnalyze}
-                            disabled={isLoading}
-                        >
-                            {isLoading ? <Spinner /> : 'Analyze Pitch'}
-                        </button>
+                {/* Tab Navigation */}
+                <div className="max-w-3xl mx-auto mb-8">
+                    <div className="flex gap-1 border-b border-gray-700">
+                        <TabButton
+                            label="Text Analyzer"
+                            icon="📝"
+                            isActive={activeTab === 'text'}
+                            onClick={() => setActiveTab('text')}
+                        />
+                        <TabButton
+                            label="Photo Scanner"
+                            icon="📷"
+                            isActive={activeTab === 'photo'}
+                            onClick={() => setActiveTab('photo')}
+                        />
                     </div>
                 </div>
 
-                <div className="max-w-3xl mx-auto mt-12">
-                    <h3 className="text-lg font-semibold text-center text-gray-400 mb-4">Or, Try an Example:</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {samplePitches.map(p => <SamplePitchCard key={p.title} {...p} onClick={handleSampleClick} />)}
-                    </div>
-                </div>
+                {/* Text Analyzer Tab */}
+                {activeTab === 'text' && (
+                    <>
+                        <div className="max-w-3xl mx-auto text-center">
+                            <h2 className="text-3xl font-bold mb-2">Uncover Hidden Risks in Investment Pitches</h2>
+                            <p className="text-gray-400 mb-8">
+                                Paste any investment pitch, business plan, or crypto whitepaper below. Our AI will analyze it for common red flags, deceptive language, and potential scam tactics.
+                            </p>
+                        </div>
 
-                {analysisResult && <AnalysisResult result={analysisResult} />}
+                        <div className="max-w-3xl mx-auto bg-gray-800 p-6 rounded-lg shadow-2xl border border-gray-700">
+                            <textarea
+                                className="w-full h-48 p-4 bg-gray-900 text-gray-200 border border-gray-600 rounded-md focus:ring-2 focus:ring-red-500 focus:outline-none transition-all duration-300"
+                                placeholder="Paste the investment pitch text here..."
+                                value={pitchText}
+                                onChange={(e) => setPitchText(e.target.value)}
+                                disabled={isLoading}
+                            />
+
+                            {error && <p className="text-red-400 mt-4 text-sm">{error}</p>}
+
+                            <div className="mt-4 text-center">
+                                <button
+                                    className="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg transition-all duration-300 disabled:bg-gray-600 disabled:cursor-not-allowed transform hover:scale-105"
+                                    onClick={handleAnalyze}
+                                    disabled={isLoading}
+                                >
+                                    {isLoading ? <Spinner /> : 'Analyze Pitch'}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="max-w-3xl mx-auto mt-12">
+                            <h3 className="text-lg font-semibold text-center text-gray-400 mb-4">Or, Try an Example:</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {samplePitches.map(p => <SamplePitchCard key={p.title} {...p} onClick={handleSampleClick} />)}
+                            </div>
+                        </div>
+
+                        {analysisResult && <AnalysisResult result={analysisResult} />}
+                    </>
+                )}
+
+                {/* Photo Scanner Tab */}
+                {activeTab === 'photo' && <PhotoScanner />}
 
             </main>
 
